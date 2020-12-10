@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>vedru app</h1>
+<table id="usersList">
+
+</table>
+<br>
+<form action="#">
+    <input id="user_name" type="text" placeholder="User name">
+    <input id="user_login" type="text" placeholder="Login">
+    <input id="user_email" type="text" placeholder="Email">
+    <button onclick="createUser()">Create user</button>
+</form>
+<br>
+<input id="search_field"></input>
+<button onclick="searchByLogin()">Search by login</button>
+<br>
+<script>
+    function createUser(){
+        var userName = document.getElementById("user_name").value;
+        var userLogin = document.getElementById("user_login").value;
+        var userEmail = document.getElementById("user_email").value;
+
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("POST", "http://localhost:8080/users/save");
+        xmlhttp.setRequestHeader("Content-Type", "application/json");
+        xmlhttp.send(JSON.stringify({name:userName, login:userLogin, email:userEmail}))
+        loadUsers();
+
+
+    }
+    function loadUsers(){
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if(this.readyState== 4 && this.status==200){
+                var users = JSON.parse(this.responseText);
+                var html = "<tr>" +
+                "<th>User id</th>" +
+                "<th>User login</th>" +
+                "<th>User email</th>" +
+                "<th>Delete</th>" +
+                "</tr>";
+                for(var i = 0; i < users.length; i++){
+                    var user = users[i];
+                    console.log(user);
+                    html = html + "<tr><td>" + user.id + "</td>" +
+                    "<td>" + user.name + "</td>" +
+                    "<td>" + user.login + "</td>" +
+                    "<td>" + user.email + "</td>" +
+                    "<td><button onclick='deleteUser(" + user.id + ")'>Delete</button></td></tr>";
+                }
+                document.getElementById("usersList").innerHTML = html;
+            }
+        };
+        xhttp.open("GET", "http://localhost:8080/users/findAll", true)
+        xhttp.send();
+    }
+
+</script>
+</body>
+</html>
